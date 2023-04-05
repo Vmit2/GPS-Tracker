@@ -21,3 +21,11 @@ Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
 #### https://vmit2.github.io/
 
+## Dependecies -
+
+### NodeJS and NPM latest version. (Please follow below link to install)
+#### https://nodejs.org/en/download
+
+### Visual Studio Code to check the code.
+#### https://code.visualstudio.com/download
+
