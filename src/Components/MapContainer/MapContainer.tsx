@@ -1,4 +1,8 @@
-import { GoogleMap, Marker, useLoadScript } from "@react-google-maps/api";
+import {
+  GoogleMap,
+  Marker,
+  useLoadScript
+} from "@react-google-maps/api";
 import { useEffect, useRef, useState } from "react";
 
 enum LibraryName {
@@ -35,22 +39,28 @@ function MapContainer(props: Props) {
   useEffect(() => {
     navigator.geolocation.getCurrentPosition((position) => {
       const { latitude, longitude } = position.coords;
-      localStorage.setItem("CurrentLocation", JSON.stringify({ lat: latitude, lng: longitude }));
-      if (!center) {
-        setCenter({ lat: latitude, lng: longitude });
-        setMarkerPosition({ lat: latitude, lng: longitude });
-      }
+      localStorage.setItem(
+        "CurrentLocation",
+        JSON.stringify({ lat: latitude, lng: longitude })
+      );
+      setCenter({ lat: latitude, lng: longitude });
+      setMarkerPosition({ lat: latitude, lng: longitude });
     });
 
-    if (center) {
-      navigator.geolocation.watchPosition((position) => {
-        const { latitude, longitude } = position.coords;
-        localStorage.setItem("CurrentLocation", JSON.stringify({ lat: latitude, lng: longitude }));
-        setCenter({ lat: latitude, lng: longitude });
-        setMarkerPosition({ lat: latitude, lng: longitude });
-      });
-    }
-  }, [center]);
+    const watchId = navigator.geolocation.watchPosition((position) => {
+      const { latitude, longitude } = position.coords;
+      localStorage.setItem(
+        "CurrentLocation",
+        JSON.stringify({ lat: latitude, lng: longitude })
+      );
+      setCenter({ lat: latitude, lng: longitude });
+      setMarkerPosition({ lat: latitude, lng: longitude });
+    });
+
+    return () => {
+      navigator.geolocation.clearWatch(watchId);
+    };
+  }, []);
 
   if (loadError) return <div>Error loading maps</div>;
   if (!isLoaded) return <div>Loading maps</div>;
@@ -69,17 +79,19 @@ function MapContainer(props: Props) {
   };
 
   const localCordinates = localStorage.getItem("CurrentLocation");
-  const currenLocation = center ||
-    (localCordinates && JSON.parse(localCordinates)) || {
-      lat: 37.7749,
-      lng: -122.4194,
-    };
+  const currentLocation =
+    center || (localCordinates && JSON.parse(localCordinates));
+  // || {
+  //   lat: 37.7749,
+  //   lng: -122.4194,
+  // };
+
   return (
     <>
       <div className="mapStyle">
         <GoogleMap
           mapContainerStyle={mapContainerStyle}
-          center={currenLocation}
+          center={currentLocation}
           zoom={16}
           onLoad={(map) => {
             mapRef.current = map;
